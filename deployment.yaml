@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubetimer
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubetimer
+  template:
+    metadata:
+      labels:
+        app: kubetimer
+    spec:
+      serviceAccountName: kubetimer-sa  # <--- IMPORTANT: Link the RBAC here
+      containers:
+      - name: operator
+        image: ryanjorgeac/timer-test:v3
+        imagePullPolicy: Always
