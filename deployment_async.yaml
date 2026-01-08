@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kubetimer-sync
+  name: kubetimer-async
   namespace: default
 spec:
   replicas: 1
@@ -16,8 +16,8 @@ spec:
       serviceAccountName: kubetimer-sa
       containers:
       - name: operator
-        image: ryanjorgeac/timer-sync:v0.0.2
-        imagePullPolicy: IfNotPresent
+        image: ryanjorgeac/timer-async:v0.0.2
+        imagePullPolicy: Always
         resources:
           requests:
             memory: "50Mi"
