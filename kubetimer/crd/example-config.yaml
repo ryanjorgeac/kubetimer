@@ -1,0 +1,16 @@
+---
+# Example KubeTimerConfig resource
+# Apply this with: kubectl apply -f example-config.yaml
+
+apiVersion: kubetimer.io/v1alpha1
+kind: KubeTimerConfig
+metadata:
+  name: default
+spec:
+  # Watch only Deployments
+  enabledResources:
+    - deployments
+  annotationKey: "kubetimer.io/ttl"
+  checkIntervalSeconds: 60
+  namespace: "all"
+  dryRun: false
