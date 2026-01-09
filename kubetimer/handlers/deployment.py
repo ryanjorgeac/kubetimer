@@ -4,6 +4,8 @@ Deployment handler for KubeTimer operator.
 Contains Kopf handlers for managing Deployment lifecycle based on TTL.
 """
 
+from typing import List
+
 from kubernetes import client
 
 from kubetimer.utils.logging import get_logger
@@ -12,42 +14,75 @@ from kubetimer.utils.time_utils import is_ttl_expired, parse_ttl
 logger = get_logger(__name__)
 
 
+def should_scan_namespace(
+    namespace: str,
+    include_namespaces: List[str],
+    exclude_namespaces: List[str]
+) -> bool:
+    """
+    Determine if a namespace should be scanned based on include/exclude rules.
+
+    Args:
+        namespace: The namespace to check
+        include_namespaces: List of namespaces to include (empty = all)
+        exclude_namespaces: List of namespaces to exclude
+    
+    Returns:
+        bool: True if namespace should be scanned, False otherwise
+    """
+
+    if namespace in exclude_namespaces:
+        return False
+
+    if not include_namespaces:
+        return True
+
+    return namespace in include_namespaces
+
+
 def scan_and_delete_deployments(
     apps_v1: client.AppsV1Api,
-    namespace: str,
+    include_namespaces: List[str],
+    exclude_namespaces: List[str],
     annotation_key: str,
-    dry_run: bool
+    dry_run: bool,
+    timezone_str: str = "UTC"
 ) -> int:
     """
-    Scan all Deployments in a namespace for expired TTL and delete them.
-    
+    Scan Deployments across namespaces for expired TTL and delete them.
+
     Args:
         apps_v1: Kubernetes AppsV1Api client
-        namespace: Kubernetes namespace to scan, or "all" for all namespaces
+        include_namespaces: Namespaces to include (empty = all)
+        exclude_namespaces: Namespaces to exclude
         annotation_key: The annotation key containing TTL value
-        dry_run: If True, only log what would be deleted (don't actually delete)
+        dry_run: If True, only log what would be deleted
+        timezone_str: Timezone for TTL comparison (default: UTC)
     
     Returns:
         int: Number of deployments deleted (or would be deleted in dry-run)
     """
-
-    if namespace == "all":
-        deployments = apps_v1.list_deployment_for_all_namespaces()
-        logger.info(
-            "scanning_all_namespaces",
-            deployment_count=len(deployments.items)
-        )
-    else:
-        deployments = apps_v1.list_namespaced_deployment(namespace)
-        logger.info(
-            "scanning_namespace",
-            namespace=namespace,
-            deployment_count=len(deployments.items)
-        )
+    # Could we use some type of cache here? @kopf.index?
+    # Also, could we use watchers instead of scanning all?
+    deployments = apps_v1.list_deployment_for_all_namespaces()
+    
+    logger.info(
+        "scanning_deployments",
+        total_deployments=len(deployments.items),
+        include_namespaces=include_namespaces or "all",
+        exclude_namespaces=exclude_namespaces
+    )
     
     deleted_count = 0
+    scanned_count = 0
 
     for deployment in deployments.items:
+        ns = deployment.metadata.namespace
+        
+        if not should_scan_namespace(ns, include_namespaces, exclude_namespaces):
+            continue
+        
+        scanned_count += 1
         annotations = deployment.metadata.annotations or {}
 
         if annotation_key not in annotations:
@@ -56,13 +91,13 @@ def scan_and_delete_deployments(
         ttl_value = annotations[annotation_key]
         
         try:
-            ttl_datetime = parse_ttl(ttl_value)
+            ttl_datetime = parse_ttl(ttl_value, timezone_str)
 
-            if is_ttl_expired(ttl_datetime):
+            if is_ttl_expired(ttl_datetime, timezone_str):
                 logger.warning(
                     "deployment_expired",
                     name=deployment.metadata.name,
-                    namespace=deployment.metadata.namespace,
+                    namespace=ns,
                     ttl=ttl_value,
                     dry_run=dry_run
                 )
@@ -70,13 +105,13 @@ def scan_and_delete_deployments(
                 if not dry_run:
                     apps_v1.delete_namespaced_deployment(
                         name=deployment.metadata.name,
-                        namespace=deployment.metadata.namespace,
+                        namespace=ns,
                         body=client.V1DeleteOptions()
                     )
                     logger.info(
                         "deployment_deleted",
                         name=deployment.metadata.name,
-                        namespace=deployment.metadata.namespace
+                        namespace=ns
                     )
                 
                 deleted_count += 1
@@ -85,10 +120,15 @@ def scan_and_delete_deployments(
             logger.error(
                 "invalid_ttl_format",
                 name=deployment.metadata.name,
-                namespace=deployment.metadata.namespace,
+                namespace=ns,
                 ttl=ttl_value,
                 error=str(e)
             )
     
-    logger.info("scan_complete", deleted_count=deleted_count, dry_run=dry_run)
+    logger.info(
+        "scan_complete",
+        scanned_deployments=scanned_count,
+        deleted_count=deleted_count,
+        dry_run=dry_run
+    )
     return deleted_count

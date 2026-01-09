@@ -47,10 +47,42 @@ spec:
                   maximum: 3600
                   default: 60
                   description: How often to scan for expired resources (seconds)
-                namespace:
+                namespaces:
+                  type: object
+                  description: Namespace filtering configuration
+                  properties:
+                    include:
+                      type: array
+                      items:
+                        type: string
+                      description: |
+                        Namespaces to include in scanning.
+                        If empty, all namespaces are scanned (minus excludes).
+                    exclude:
+                      type: array
+                      items:
+                        type: string
+                      default:
+                        - kube-system
+                        - kube-public
+                        - kube-node-lease
+                      description: |
+                        Namespaces to exclude from scanning.
+                        These are skipped even if in the include list.
+                        Default excludes Kubernetes system namespaces.
+                  default:
+                    include: []
+                    exclude:
+                      - kube-system
+                      - kube-public
+                      - kube-node-lease
+                timezone:
                   type: string
-                  default: "all"
-                  description: Namespace to scan ("all" for all namespaces)
+                  default: "UTC"
+                  description: |
+                    Timezone for TTL comparison (IANA format).
+                    Examples: "UTC", "America/New_York", "Europe/London"
+                
                 dryRun:
                   type: boolean
                   default: false

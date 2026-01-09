@@ -7,10 +7,29 @@ kind: KubeTimerConfig
 metadata:
   name: default
 spec:
-  # Watch only Deployments
+  # Which resources to watch for TTL annotations
   enabledResources:
     - deployments
+    # - pods        # Not implemented yet
+    # - replicasets # Not implemented yet
+  
+  # The annotation key to look for on resources
   annotationKey: "kubetimer.io/ttl"
   checkIntervalSeconds: 60
-  namespace: "all"
+  
+  # Namespace filtering
+  # include: [] (empty) = scan all namespaces except those in exclude
+  # include: ["prod", "staging"] = scan ONLY these namespaces
+  namespaces:
+    include: []  # Empty means all namespaces
+    exclude:
+      - kube-system
+      - kube-public
+      - kube-node-lease
+  
+  # Timezone for TTL comparison (IANA format)
+  # Examples: "UTC", "America/New_York", "Europe/London", "Asia/Tokyo"
+  timezone: "UTC"
+  
+  # Set to true to test without actually deleting
   dryRun: false
