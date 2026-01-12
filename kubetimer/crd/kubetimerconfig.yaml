@@ -87,12 +87,15 @@ spec:
         - name: Resources
           type: string
           jsonPath: .spec.enabledResources
-        - name: Namespace
+        - name: Annotation Key
           type: string
-          jsonPath: .spec.namespace
-        - name: Interval
-          type: integer
-          jsonPath: .spec.checkIntervalSeconds
+          jsonPath: .spec.annotationKey
+        - name: Namespaces
+          type: string
+          jsonPath: .spec.namespaces
+        - name: Timezone
+          type: string
+          jsonPath: .spec.timezone
         - name: Dry Run
           type: boolean
           jsonPath: .spec.dryRun
