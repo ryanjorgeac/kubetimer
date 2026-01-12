@@ -91,7 +91,7 @@ def scan_and_delete_deployments(
         ttl_value = annotations[annotation_key]
         
         try:
-            ttl_datetime = parse_ttl(ttl_value, timezone_str)
+            ttl_datetime = parse_ttl(ttl_value)
 
             if is_ttl_expired(ttl_datetime, timezone_str):
                 logger.warning(

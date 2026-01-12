@@ -11,8 +11,6 @@ Usage:
 Environment Variables:
     KUBETIMER_LOG_LEVEL: Logging level (default: INFO)
     KUBETIMER_LOG_FORMAT: Log format, json or text (default: text)
-    KUBETIMER_ANNOTATION_KEY: TTL annotation key (default: kubetimer.io/ttl)
-    KUBETIMER_DEFAULT_NAMESPACE: Default namespace (default: default)
     KUBETIMER_CHECK_INTERVAL: Check interval in seconds (default: 60)
 """
 

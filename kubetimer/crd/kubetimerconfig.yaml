@@ -41,12 +41,6 @@ spec:
                   type: string
                   default: "kubetimer.io/ttl"
                   description: Annotation key to look for TTL values
-                checkIntervalSeconds:
-                  type: integer
-                  minimum: 5
-                  maximum: 3600
-                  default: 60
-                  description: How often to scan for expired resources (seconds)
                 namespaces:
                   type: object
                   description: Namespace filtering configuration

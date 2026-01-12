@@ -15,7 +15,6 @@ spec:
   
   # The annotation key to look for on resources
   annotationKey: "kubetimer.io/ttl"
-  checkIntervalSeconds: 60
   
   # Namespace filtering
   # include: [] (empty) = scan all namespaces except those in exclude

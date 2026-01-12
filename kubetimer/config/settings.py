@@ -43,16 +43,6 @@ class Settings(BaseSettings):
         default="text",
         description="Log output format (json for production, text for development)"
     )
-
-    annotation_key: str = Field(
-        default="kubetimer.io/ttl",
-        description="The annotation key to look for TTL values"
-    )
-    
-    default_namespace: str = Field(
-        default="default",
-        description="Default namespace when not specified in CRD"
-    )
     
     check_interval: int = Field(
         default=60,
