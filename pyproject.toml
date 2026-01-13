@@ -7,4 +7,5 @@ requires-python = ">=3.14"
 dependencies = [
     "kopf>=1.40.0",
     "kubernetes>=34.1.0",
+    "uvloop>=0.22.1",
 ]
