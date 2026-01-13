@@ -1,10 +1,3 @@
-"""
-Logging utilities for KubeTimer operator.
-
-Provides structured logging with support for JSON and text formats.
-Uses structlog for structured, contextual logging.
-"""
-
 import logging
 import sys
 
@@ -14,15 +7,6 @@ from kubetimer.config.settings import get_settings
 
 # Could we use lcu cache?
 def setup_logging():
-    """
-    Configure logging for the operator.
-    
-    Sets up structlog with processors for structured logging.
-    Supports both JSON (for production) and colored text (for development).
-    
-    Returns:
-        A configured structlog logger instance
-    """
     settings = get_settings()
     
     logging.basicConfig(
@@ -58,11 +42,9 @@ def setup_logging():
 
 
 def get_logger(name: str = None) -> structlog.stdlib.BoundLogger:
-    """
-    Args:
-        name: Optional logger name (typically __name__ of the module)
-    
-    Returns:
-        A structlog logger instance
-    """
     return structlog.get_logger(name)
+
+
+def map_log_level(level_str: str) -> int:
+    level_str = level_str.upper()
+    return getattr(logging, level_str, logging.INFO)
