@@ -2,10 +2,11 @@
 # Example KubeTimerConfig resource
 # Apply this with: kubectl apply -f example-config.yaml
 
-apiVersion: kubetimer.io/v1alpha1
+apiVersion: kubetimer.io/v1
 kind: KubeTimerConfig
 metadata:
-  name: default
+  name: kubetimerconfig
+  namespace: kubetimer-system
 spec:
   # Which resources to watch for TTL annotations
   enabledResources:
@@ -31,4 +32,4 @@ spec:
   timezone: "UTC"
   
   # Set to true to test without actually deleting
-  dryRun: false
+  dryRun: true
