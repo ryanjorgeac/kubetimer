@@ -18,7 +18,7 @@ __version__ = "0.1.0"
 __author__ = "Ryan Carvalho"
 
 from kubetimer.config import Settings, get_settings
-from kubetimer.utils.logging import get_logger, setup_logging
+from kubetimer.utils.logs import get_logger, setup_logging
 
 __all__ = [
     "Settings",
