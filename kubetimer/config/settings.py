@@ -22,8 +22,6 @@ class Settings(BaseSettings):
     Attributes:
         log_level: Logging level (DEBUG, INFO, WARNING, ERROR)
         log_format: Output format (json for production, text for development)
-        annotation_key: The annotation key to look for TTL values
-        default_namespace: Default namespace when not specified in CRD
         check_interval: Default check interval in seconds
     """
     

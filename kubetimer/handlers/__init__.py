@@ -8,9 +8,8 @@ Exports:
 """
 
 from kubetimer.handlers.deployment import (
-    deployment_index_handler,
-    scan_and_delete_deployments,
-    scan_deployments_from_index,
+    deployment_indexer,
+    deployment_handler,
 )
 
 from kubetimer.handlers.timer import (
@@ -29,9 +28,8 @@ from kubetimer.handlers.registry import (
 )
 
 __all__ = [
-    "deployment_index_handler",
-    "scan_and_delete_deployments",
-    "scan_deployments_from_index",
+    "deployment_indexer",
+    "deployment_handler",
     "check_ttl_timer_handler",
     "config_index_handler",
     "config_changed_handler",

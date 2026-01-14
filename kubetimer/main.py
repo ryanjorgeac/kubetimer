@@ -9,7 +9,7 @@ import uvloop
 from kubetimer.config.k8s import get_kubetimerconfig, load_k8s_config
 from kubetimer.config.settings import get_settings
 from kubetimer.handlers import (
-    deployment_index_handler,
+    deployment_indexer,
     check_ttl_timer_handler,
     config_index_handler,
     config_changed_handler,
@@ -52,7 +52,7 @@ def register_all_handlers():
 
     register_all_indexes(
         memo=_registration_memo,
-        deployment_index_fn=deployment_index_handler,
+        deployment_index_fn=deployment_indexer,
         # pod_index_fn=pod_index_handler,  # Add when implemented
         # statefulset_index_fn=statefulset_index_handler,
     )

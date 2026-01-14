@@ -11,8 +11,7 @@ import kopf
 
 from kubetimer.config.k8s import apps_v1_client
 from kubetimer.handlers.deployment import (
-    deployment_index_handler,
-    scan_deployments_from_index,
+    deployment_handler,
 )
 from kubetimer.utils.logs import get_logger
 
@@ -22,7 +21,7 @@ logger = get_logger(__name__)
 def check_ttl_timer_handler(
     name,
     memo: kopf.Memo,
-    deployment_index_handler: kopf.Index,
+    deployment_indexer: kopf.Index,
     **_
 ):
     enabled_resources = memo.enabled_resources
@@ -50,9 +49,9 @@ def check_ttl_timer_handler(
     apps_v1 = apps_v1_client()
 
     if 'deployments' in enabled_resources:
-        deleted_count = scan_deployments_from_index(
+        deleted_count = deployment_handler(
             apps_v1=apps_v1,
-            deployment_index=deployment_index_handler,
+            deployment_index=deployment_indexer,
             include_namespaces=include_namespaces,
             exclude_namespaces=exclude_namespaces,
             annotation_key=annotation_key,
@@ -65,6 +64,11 @@ def check_ttl_timer_handler(
     # if 'pods' in enabled_resources:
     #     deleted_count = scan_pods_from_index(...)
     #     logger.info("pods_processed", deleted=deleted_count)
+
+    logger.info(
+        "scan_completed",
+        config=name,
+    )
 
 
 def config_index_handler(
