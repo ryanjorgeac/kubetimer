@@ -26,8 +26,7 @@ def configure_memo(memo: kopf.Memo, config: KubeTimerConfig) -> None:
     memo.config_loaded = True
     logger.info(
         "memo_configured",
-        enabled_resources=list(memo.enabled_resources),
-        memo=memo
+        enabled_resources=list(memo.enabled_resources)
     )
 
 

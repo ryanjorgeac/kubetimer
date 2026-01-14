@@ -23,12 +23,10 @@ def deployment_index_handler(
 ) -> Optional[Dict[str, Any]]:
     annotations = meta.get('annotations', {})
 
-    return {
-        'name': name,
+    return {name: {
         'namespace': namespace,
-        'annotations': annotations,
-        'creation_timestamp': meta.get('creationTimestamp'),
-    }
+        'annotations': annotations
+    }}
 
 
 def should_scan_namespace(
@@ -36,18 +34,6 @@ def should_scan_namespace(
     include_namespaces: List[str],
     exclude_namespaces: List[str]
 ) -> bool:
-    """
-    Determine if a namespace should be scanned based on include/exclude rules.
-
-    Args:
-        namespace: The namespace to check
-        include_namespaces: List of namespaces to include (empty = all)
-        exclude_namespaces: List of namespaces to exclude
-    
-    Returns:
-        bool: True if namespace should be scanned, False otherwise
-    """
-
     if namespace in exclude_namespaces:
         return False
 
@@ -65,22 +51,7 @@ def scan_and_delete_deployments(
     dry_run: bool,
     timezone_str: str = "UTC"
 ) -> int:
-    """
-    Scan Deployments across namespaces for expired TTL and delete them.
-
-    Args:
-        apps_v1: Kubernetes AppsV1Api client
-        include_namespaces: Namespaces to include (empty = all)
-        exclude_namespaces: Namespaces to exclude
-        annotation_key: The annotation key containing TTL value
-        dry_run: If True, only log what would be deleted
-        timezone_str: Timezone for TTL comparison (default: UTC)
     
-    Returns:
-        int: Number of deployments deleted (or would be deleted in dry-run)
-    """
-    # Could we use some type of cache here? @kopf.index?
-    # Also, could we use watchers instead of scanning all?
     deployments = apps_v1.list_deployment_for_all_namespaces()
     
     logger.info(
@@ -164,26 +135,22 @@ def scan_deployments_from_index(
     deleted_count = 0
     scanned_count = 0
 
-    all_deployments = []
-    for key, values in deployment_index.items():
-        all_deployments.extend(values)
-    
     logger.info(
         "scanning_deployments_from_index",
-        total_indexed=len(all_deployments),
+        total_indexed=len(deployment_index),
         include_namespaces=include_namespaces or "all",
         exclude_namespaces=exclude_namespaces
     )
 
-    for deployment_data in all_deployments:
-        ns = deployment_data['namespace']
-        name = deployment_data['name']
-        
+    for name, store in deployment_index.items():
+        value = [v for v in store][0]
+        ns = value['namespace']
+        logger.info("checking_deployment", deployment=name, namespace=ns)
         if not should_scan_namespace(ns, include_namespaces, exclude_namespaces):
             continue
         
         scanned_count += 1
-        annotations = deployment_data.get('annotations', {})
+        annotations = value.get('annotations', {})
 
         if annotation_key not in annotations:
             continue

@@ -20,7 +20,6 @@ logger = get_logger(__name__)
 
 
 def check_ttl_timer_handler(
-    spec,
     name,
     memo: kopf.Memo,
     deployment_index_handler: kopf.Index,
