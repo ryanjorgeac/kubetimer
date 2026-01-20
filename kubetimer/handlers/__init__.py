@@ -22,7 +22,6 @@ from kubetimer.handlers.registry import (
     init_memo,
     configure_memo,
     register_all_indexes,
-    register_resource_indexes,
     is_index_registered_in_memo,
     get_registered_indexes_from_memo,
 )
@@ -36,7 +35,6 @@ __all__ = [
     "init_memo",
     "configure_memo",
     "register_all_indexes",
-    "register_resource_indexes",
     "is_index_registered_in_memo",
     "get_registered_indexes_from_memo",
 ]

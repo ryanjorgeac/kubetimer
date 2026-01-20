@@ -52,9 +52,7 @@ def register_all_handlers():
 
     register_all_indexes(
         memo=_registration_memo,
-        deployment_index_fn=deployment_indexer,
-        # pod_index_fn=pod_index_handler,  # Add when implemented
-        # statefulset_index_fn=statefulset_index_handler,
+        deployment_index_fn=deployment_indexer
     )
 
     kopf.index('kubetimer.io', 'v1', 'kubetimerconfigs')(config_index_handler)
