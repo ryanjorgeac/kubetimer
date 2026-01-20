@@ -14,7 +14,6 @@ from kubetimer.handlers.deployment import (
 
 from kubetimer.handlers.timer import (
     check_ttl_timer_handler,
-    config_index_handler,
     config_changed_handler,
 )
 
@@ -30,7 +29,6 @@ __all__ = [
     "deployment_indexer",
     "deployment_handler",
     "check_ttl_timer_handler",
-    "config_index_handler",
     "config_changed_handler",
     "init_memo",
     "configure_memo",

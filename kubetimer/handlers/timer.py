@@ -26,6 +26,10 @@ def check_ttl_timer_handler(
     logger: kopf.Logger,
     **_
 ):  
+    if name != 'kubetimerconfig':
+        klogger.warning("ignoring_non_default_config", config=name)
+        return  
+    
     starttime = datetime.now()
     enabled_resources = memo.enabled_resources
     annotation_key = memo.annotation_key
@@ -75,24 +79,6 @@ def check_ttl_timer_handler(
         time=completiontime
     )
     logger.info(f"ttl_check_completed: {name} in {completiontime:.2f}s")
-
-
-def config_index_handler(
-    name: str,
-    namespace: str,
-    spec: kopf.Spec,
-    **_
-) -> Dict[str, Any]:
-    return {
-        'name': name,
-        'namespace': namespace,
-        'enabled_resources': spec.get('enabledResources', ['deployments']),
-        'annotation_key': spec.get('annotationKey', 'kubetimer.io/ttl'),
-        'dry_run': spec.get('dryRun', False),
-        'timezone': spec.get('timezone', 'UTC'),
-        'namespaces': spec.get('namespaces', {}),
-        'check_interval': spec.get('checkIntervalSeconds', 60),
-    }
 
 
 def config_changed_handler(spec, name, **_):

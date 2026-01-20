@@ -11,7 +11,6 @@ from kubetimer.config.settings import get_settings
 from kubetimer.handlers import (
     deployment_indexer,
     check_ttl_timer_handler,
-    config_index_handler,
     config_changed_handler,
     init_memo,
     configure_memo,
@@ -55,7 +54,6 @@ def register_all_handlers():
         deployment_index_fn=deployment_indexer
     )
 
-    kopf.index('kubetimer.io', 'v1', 'kubetimerconfigs')(config_index_handler)
     kopf.on.create('kubetimer.io', 'v1', 'kubetimerconfigs')(config_changed_handler)
     kopf.on.update('kubetimer.io', 'v1', 'kubetimerconfigs')(config_changed_handler)
 
