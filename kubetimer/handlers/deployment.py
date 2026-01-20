@@ -20,14 +20,21 @@ def deployment_indexer(
     name: str,
     namespace: str,
     meta: kopf.Meta,
+    memo: kopf.Memo,
     **_
 ) -> Optional[Dict[str, Any]]:
     annotations = meta.get('annotations', {})
+    date = annotations.get(memo.annotation_key, '')
 
-    return {name: {
-        'namespace': namespace,
-        'annotations': annotations
-    }}
+    if not date:
+        return None
+    
+    return {
+        name: {
+            'namespace': namespace,
+            memo.annotation_key: date
+        }
+    }
 
 
 def should_scan_namespace(
@@ -71,7 +78,7 @@ def deployment_handler(
             deployments_snapshot.append({
                 'name': name,
                 'namespace': value['namespace'],
-                'annotations': copy.deepcopy(value.get('annotations', {}))
+                annotation_key: copy.deepcopy(value.get(annotation_key))
             })
 
     logger.debug("deployment_snapshot", count=len(deployments_snapshot))
@@ -86,13 +93,8 @@ def deployment_handler(
             continue
         
         scanned_count += 1
-        annotations = deployment_info.get('annotations')
+        ttl_value = deployment_info.get(annotation_key)
 
-        if annotation_key not in annotations:
-            continue
-        
-        ttl_value = annotations[annotation_key]
-        
         try:
             ttl_datetime = parse_ttl(ttl_value)
 
