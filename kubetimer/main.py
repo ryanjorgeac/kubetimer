@@ -36,8 +36,9 @@ def startup_handler(settings: kopf.OperatorSettings, memo: kopf.Memo, **_):
             "startup_config_loaded",
             enabled_resources=config.enabled_resources,
         )
-    except Exception as e:
-        logger.warning("startup_config_load_failed", error=str(e))
+    except Exception:
+        logger.error("startup_config_load_failed")
+        raise
 
 
 _registration_memo = kopf.Memo()
@@ -56,6 +57,7 @@ def register_all_handlers():
 
     kopf.on.create('kubetimer.io', 'v1', 'kubetimerconfigs')(config_changed_handler)
     kopf.on.update('kubetimer.io', 'v1', 'kubetimerconfigs')(config_changed_handler)
+    kopf.on.probe(id="health")(lambda **_: True)
 
     kopf.timer(
         'kubetimer.io', 'v1', 'kubetimerconfigs',
@@ -80,6 +82,7 @@ def main():
         standalone=True,
         clusterwide=True,
         loop=uvloop.EventLoopPolicy().new_event_loop(),
+        liveness_endpoint="http://0.0.0.0:8080/healthz",
     )
 
 
