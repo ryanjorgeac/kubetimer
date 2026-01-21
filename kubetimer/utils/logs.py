@@ -1,11 +1,12 @@
 import logging
 import sys
+from functools import lru_cache
 
 import structlog
 
 from kubetimer.config.settings import get_settings
 
-# Could we use lcu cache?
+@lru_cache(maxsize=1)
 def setup_logging():
     settings = get_settings()
     

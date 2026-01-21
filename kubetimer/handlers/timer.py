@@ -6,7 +6,7 @@ for resources with expired TTL.
 """
 
 from datetime import datetime
-from typing import Any, Dict
+import logging
 
 import kopf
 
@@ -15,8 +15,12 @@ from kubetimer.handlers.deployment import (
     deployment_handler,
 )
 from kubetimer.utils.logs import get_logger
+from kubetimer.utils.memory_profiler import get_memory_snapshot, print_memory_report, is_profiling_enabled
 
 klogger = get_logger(__name__)
+
+# Standard library logger for level checking (structlog doesn't expose isEnabledFor)
+_stdlib_logger = logging.getLogger(__name__)
 
 
 def check_ttl_timer_handler(
@@ -29,7 +33,7 @@ def check_ttl_timer_handler(
     if name != 'kubetimerconfig':
         klogger.warning("ignoring_non_default_config", config=name)
         return  
-    
+
     starttime = datetime.now()
     enabled_resources = memo.enabled_resources
     annotation_key = memo.annotation_key
@@ -79,6 +83,11 @@ def check_ttl_timer_handler(
         time=completiontime
     )
     logger.info(f"ttl_check_completed: {name} in {completiontime:.2f}s")
+    
+    # Optional: print memory report when profiling is enabled
+    # Enable with ENABLE_MEMORY_PROFILING=true
+    if is_profiling_enabled() and _stdlib_logger.isEnabledFor(logging.DEBUG):
+        print_memory_report()
 
 
 def config_changed_handler(spec, name, **_):
