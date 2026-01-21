@@ -11,8 +11,6 @@ spec:
   # Which resources to watch for TTL annotations
   enabledResources:
     - deployments
-    # - pods        # Not implemented yet
-    # - replicasets # Not implemented yet
   
   # The annotation key to look for on resources
   annotationKey: "kubetimer.io/ttl"
@@ -31,5 +29,5 @@ spec:
   # Examples: "UTC", "America/New_York", "Europe/London", "Asia/Tokyo"
   timezone: "UTC"
   
-  # Set to true to test without actually deleting
+  # Set to true to test without actually deletions
   dryRun: true

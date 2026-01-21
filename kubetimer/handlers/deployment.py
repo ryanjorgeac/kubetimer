@@ -4,7 +4,6 @@ Deployment handler for KubeTimer operator.
 Contains Kopf handlers for managing Deployment lifecycle based on TTL.
 """
 
-import copy
 from typing import Any, Dict, List, Optional
 
 import kopf
@@ -78,7 +77,7 @@ def deployment_handler(
             deployments_snapshot.append({
                 'name': name,
                 'namespace': value['namespace'],
-                annotation_key: copy.deepcopy(value.get(annotation_key))
+                annotation_key: value.get(annotation_key)
             })
 
     logger.debug("deployment_snapshot", count=len(deployments_snapshot))
