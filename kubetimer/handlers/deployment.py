@@ -60,7 +60,7 @@ def deployment_handler(
     timezone_str: str = "UTC"
 ) -> int:
 
-    logger.info(
+    logger.debug(
         "scanning_deployments_from_index",
         total_indexed=len(deployment_index),
         include_namespaces=include_namespaces or "all",
@@ -86,19 +86,20 @@ def deployment_handler(
         name = deployment_info['name']
         ns = deployment_info['namespace']
 
-        logger.info("checking_deployment", deployment=name, namespace=ns)
+        logger.debug("checking_deployment", deployment=name, namespace=ns)
 
         if not should_scan_namespace(ns, include_namespaces, exclude_namespaces):
             continue
         
         scanned_count += 1
+
         ttl_value = deployment_info.get(annotation_key)
 
         try:
             ttl_datetime = parse_ttl(ttl_value)
 
             if is_ttl_expired(ttl_datetime, timezone_str):
-                logger.warning(
+                logger.debug(
                     "deployment_expired",
                     name=name,
                     namespace=ns,
@@ -127,7 +128,7 @@ def deployment_handler(
         except client.ApiException as e:
             if e.status != 404:
                 logger.error(
-                    "deployment was already deleted.",
+                    "deployment_was_already_deleted",
                     name=name,
                     namespace=ns)
             else:
@@ -139,7 +140,7 @@ def deployment_handler(
                 )
     
     logger.info(
-        "scan_complete",
+        "deployment_scan_complete",
         scanned_deployments=scanned_count,
         deleted_count=deleted_count,
         dry_run=dry_run

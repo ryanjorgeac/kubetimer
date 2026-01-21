@@ -25,17 +25,14 @@ logger = setup_logging()
 def startup_handler(settings: kopf.OperatorSettings, memo: kopf.Memo, **_):
     logger.info("kubetimer_operator_starting_up")
     settings.execution.max_workers = 20
-    settings.posting.level = map_log_level(kubetimer_settings.log_level)
+    settings.posting.level = map_log_level(kubetimer_settings.kopf_log_level)
 
     try:
         load_k8s_config()
         config = get_kubetimerconfig()
         configure_memo(memo, config)
         
-        logger.info(
-            "startup_config_loaded",
-            enabled_resources=config.enabled_resources,
-        )
+        logger.info("startup_config_loaded")
     except Exception:
         logger.error("startup_config_load_failed")
         raise
@@ -64,8 +61,6 @@ def register_all_handlers():
         interval=float(kubetimer_settings.check_interval),
         idle=10.0
     )(check_ttl_timer_handler)
-    
-    logger.info("kopf_handlers_registered")
 
 
 register_all_handlers()

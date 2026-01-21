@@ -9,7 +9,8 @@ Usage:
     kopf run kubetimer/main.py --standalone
 
 Environment Variables:
-    KUBETIMER_LOG_LEVEL: Logging level (default: INFO)
+    KUBETIMER_LOG_LEVEL: Kubetimer logging level (default: INFO)
+    KUBETIMER_KOPF_LOG_LEVEL: Kopf logging level (default: WARNING)
     KUBETIMER_LOG_FORMAT: Log format, json or text (default: text)
     KUBETIMER_CHECK_INTERVAL: Check interval in seconds (default: 60)
 """

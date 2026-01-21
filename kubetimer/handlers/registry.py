@@ -26,7 +26,11 @@ def configure_memo(memo: kopf.Memo, config: KubeTimerConfig) -> None:
     memo.config_loaded = True
     logger.info(
         "memo_configured",
-        enabled_resources=list(memo.enabled_resources)
+        enabled_resources=list(memo.enabled_resources),
+        include_namespaces=memo.namespaces.get('include', []),
+        exclude_namespaces=memo.namespaces.get('exclude', []),
+        timezone=memo.timezone,
+        dry_run=memo.dry_run
     )
 
 
@@ -47,7 +51,7 @@ def register_all_indexes(
         kopf.index('apps', 'v1', 'deployments')(deployment_index_fn)
         memo.registered_indexes.add('deployments')
         registered.append('deployments')
-        logger.info("registered_deployment_index")
+        logger.debug("registered_deployment_index")
 
     # TODO: Add other resource indexes when implemented
     

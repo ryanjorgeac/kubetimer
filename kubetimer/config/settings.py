@@ -49,6 +49,11 @@ class Settings(BaseSettings):
         description="Default check interval in seconds"
     )
 
+    kopf_log_level: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = Field(
+        default="WARNING",
+        description="Logging level for Kopf library"
+    )
+
 
 @lru_cache
 def get_settings() -> Settings:
